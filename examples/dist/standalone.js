@@ -1331,8 +1331,10 @@ var Select = _react2['default'].createClass({
   * @param	{Object}		nextProps	- optionally specify the nextProps so the returned array uses the latest configuration
   * @returns	{Array}	the value of the select represented in an array
   */
-	getValueArray: function getValueArray(value, nextProps) {
+	getValueArray: function getValueArray(value) {
 		var _this = this;
+
+		var nextProps = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
 
 		/** support optionally passing in the `nextProps` so `componentWillReceiveProps` updates will function as expected */
 		var props = typeof nextProps === 'object' ? nextProps : this.props;
@@ -1688,7 +1690,8 @@ var Select = _react2['default'].createClass({
 	},
 
 	renderClear: function renderClear() {
-		if (!this.props.clearable || !this.props.value || this.props.value === 0 || this.props.multi && !this.props.value.length || this.props.disabled || this.props.isLoading) return;
+		if (!this.props.clearable || this.props.value === undefined || this.props.value === null || this.props.value === '' || this.props.multi && !this.props.value.length || this.props.disabled || this.props.isLoading) return;
+
 		return _react2['default'].createElement(
 			'span',
 			{ className: 'Select-clear-zone', title: this.props.multi ? this.props.clearAllText : this.props.clearValueText,
@@ -1847,7 +1850,7 @@ var Select = _react2['default'].createClass({
 		var _this8 = this;
 
 		var valueArray = this.getValueArray(this.props.value);
-		var options = this._visibleOptions = this.filterOptions(this.props.multi ? this.getValueArray(this.props.value) : null);
+		var options = this._visibleOptions = this.filterOptions(this.props.multi ? valueArray : null);
 		var isOpen = this.state.isOpen;
 		if (this.props.multi && !options.length && valueArray.length && !this.state.inputValue) isOpen = false;
 		var focusedOptionIndex = this.getFocusableOptionIndex(valueArray[0]);
