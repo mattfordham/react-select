@@ -90,6 +90,7 @@ const Select = React.createClass({
 		onMenuScrollToBottom: React.PropTypes.func, // fires when the menu is scrolled to the bottom; can be used to paginate options
 		onOpen: React.PropTypes.func,               // fires when the menu is opened
 		onValueClick: React.PropTypes.func,         // onClick handler for value labels: function (value, event) {}
+		onlyOpenWithValue: React.PropTypes.bool,    // boolean to enable opening only when the field is typed in
 		openAfterFocus: React.PropTypes.bool,       // boolean to enable opening dropdown when focused
 		openOnFocus: React.PropTypes.bool,          // always open options menu on focus
 		optionClassName: React.PropTypes.string,    // additional class(es) to apply to the <Option /> elements
@@ -144,6 +145,7 @@ const Select = React.createClass({
 			onBlurResetsInput: true,
 			onCloseResetsInput: true,
 			openAfterFocus: false,
+			onlyOpenWithValue: false,
 			optionComponent: Option,
 			pageSize: 5,
 			placeholder: 'Select...',
@@ -349,10 +351,12 @@ const Select = React.createClass({
 			input.value = '';
 
 			// if the input is focused, ensure the menu is open
-			this.setState({
-				isOpen: true,
-				isPseudoFocused: false,
-			});
+			if (!this.props.onlyOpenWithValue) {
+				this.setState({
+					isOpen: true,
+					isPseudoFocused: false,
+				});
+			}
 		} else {
 			// otherwise, focus the input and open the menu
 			this._openAfterFocus = true;
@@ -410,6 +414,9 @@ const Select = React.createClass({
 	handleInputFocus (event) {
 		if (this.props.disabled) return;
 		var isOpen = this.state.isOpen || this._openAfterFocus || this.props.openOnFocus;
+		if (!this.state.isOpen && this.props.onlyOpenWithValue) {
+			isOpen = false;
+		}
 		if (this.props.onFocus) {
 			this.props.onFocus(event);
 		}
@@ -905,6 +912,7 @@ const Select = React.createClass({
 	},
 
 	renderArrow () {
+		if (this.props.onlyOpenWithValue) return;
 		const onMouseDown = this.handleMouseDownOnArrow;
 		const arrow = this.props.arrowRenderer({ onMouseDown });
 

@@ -856,6 +856,7 @@ var Select = _react2['default'].createClass({
 		onMenuScrollToBottom: _react2['default'].PropTypes.func, // fires when the menu is scrolled to the bottom; can be used to paginate options
 		onOpen: _react2['default'].PropTypes.func, // fires when the menu is opened
 		onValueClick: _react2['default'].PropTypes.func, // onClick handler for value labels: function (value, event) {}
+		onlyOpenWithValue: _react2['default'].PropTypes.bool, // boolean to enable opening only when the field is typed in
 		openAfterFocus: _react2['default'].PropTypes.bool, // boolean to enable opening dropdown when focused
 		openOnFocus: _react2['default'].PropTypes.bool, // always open options menu on focus
 		optionClassName: _react2['default'].PropTypes.string, // additional class(es) to apply to the <Option /> elements
@@ -910,6 +911,7 @@ var Select = _react2['default'].createClass({
 			onBlurResetsInput: true,
 			onCloseResetsInput: true,
 			openAfterFocus: false,
+			onlyOpenWithValue: false,
 			optionComponent: _Option2['default'],
 			pageSize: 5,
 			placeholder: 'Select...',
@@ -1115,10 +1117,12 @@ var Select = _react2['default'].createClass({
 			input.value = '';
 
 			// if the input is focused, ensure the menu is open
-			this.setState({
-				isOpen: true,
-				isPseudoFocused: false
-			});
+			if (!this.props.onlyOpenWithValue) {
+				this.setState({
+					isOpen: true,
+					isPseudoFocused: false
+				});
+			}
 		} else {
 			// otherwise, focus the input and open the menu
 			this._openAfterFocus = true;
@@ -1176,6 +1180,9 @@ var Select = _react2['default'].createClass({
 	handleInputFocus: function handleInputFocus(event) {
 		if (this.props.disabled) return;
 		var isOpen = this.state.isOpen || this._openAfterFocus || this.props.openOnFocus;
+		if (!this.state.isOpen && this.props.onlyOpenWithValue) {
+			isOpen = false;
+		}
 		if (this.props.onFocus) {
 			this.props.onFocus(event);
 		}
@@ -1706,6 +1713,7 @@ var Select = _react2['default'].createClass({
 	},
 
 	renderArrow: function renderArrow() {
+		if (this.props.onlyOpenWithValue) return;
 		var onMouseDown = this.handleMouseDownOnArrow;
 		var arrow = this.props.arrowRenderer({ onMouseDown: onMouseDown });
 
